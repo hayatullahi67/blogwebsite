@@ -4,41 +4,141 @@ import MainLayout from '../templates/MainLayout';
 import { Heading1, BodyText, SmallText } from '../components/atoms/Typography';
 import { Badge } from '../components/ui/badge';
 import Button from '../components/atoms/Button';
-import { Calendar, Clock, ArrowLeft, Share2 } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Share2, Heart } from 'lucide-react';
 import { Separator } from '../components/ui/separator';
-import postsData from '../data/posts.json';
+import { doc, getDoc, collection, getDocs, query, where, updateDoc, increment } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 const PostDetail = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
 
   useEffect(() => {
-    const foundPost = postsData.find(p => p.id === parseInt(id));
-    setPost(foundPost);
+    const fetchPost = async () => {
+      setLoading(true);
+      try {
+        // Fetch the specific post by document ID
+        const postDoc = doc(db, 'posts', id);
+        const postSnapshot = await getDoc(postDoc);
+        
+        if (postSnapshot.exists()) {
+          const data = postSnapshot.data();
+          const formattedPost = {
+            id: postSnapshot.id,
+            title: data.title || '',
+            content: data.content || '',
+            excerpt: data.content ? data.content.substring(0, 150) + '...' : '',
+            image: data.image || '',
+            tags: data.category ? [data.category] : [],
+            date: data.createdAt ? formatDate(data.createdAt) : '',
+            readTime: data.content ? Math.ceil(data.content.split(' ').length / 200) : 5
+          };
+          
+          setPost(formattedPost);
+          setLikesCount(data.likes || 0);
+          
+          // Fetch related posts by category
+          if (data.category) {
+            const relatedQuery = query(
+              collection(db, 'posts'),
+              where('category', '==', data.category)
+            );
+            const relatedSnapshot = await getDocs(relatedQuery);
+            
+            const related = [];
+            relatedSnapshot.forEach((doc) => {
+              if (doc.id !== id) {
+                const relatedData = doc.data();
+                related.push({
+                  id: doc.id,
+                  title: relatedData.title || '',
+                  excerpt: relatedData.content ? relatedData.content.substring(0, 150) + '...' : '',
+                  tags: relatedData.category ? [relatedData.category] : []
+                });
+              }
+            });
+            
+            setRelatedPosts(related.slice(0, 3));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching post:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (foundPost) {
-      // Find related posts by matching tags
-      const related = postsData
-        .filter(p => p.id !== foundPost.id)
-        .filter(p => p.tags?.some(tag => foundPost.tags?.includes(tag)))
-        .slice(0, 3);
-      setRelatedPosts(related);
+    if (id) {
+      fetchPost();
     }
   }, [id]);
 
-  const handleShare = () => {
-    if (navigator.share && post) {
-      navigator.share({
-        title: post.title,
-        text: post.excerpt,
-        url: window.location.href,
+  // Helper function to format date
+  const formatDate = (timestamp) => {
+    if (!timestamp) return '';
+    
+    if (timestamp.toDate) {
+      return timestamp.toDate().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
-    } else {
-      // Fallback: copy URL to clipboard
-      navigator.clipboard.writeText(window.location.href);
+    }
+    
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  // const handleShare = () => {
+  //   if (navigator.share && post) {
+  //     navigator.share({
+  //       title: post.title,
+  //       text: post.excerpt,
+  //       url: window.location.href,
+  //     });
+  //   } else {
+  //     // Fallback: copy URL to clipboard
+  //     navigator.clipboard.writeText(window.location.href);
+  //   }
+  // };
+
+  const handleLike = async () => {
+    try {
+      const postRef = doc(db, 'posts', id);
+      const newLikesCount = isLiked ? likesCount - 1 : likesCount + 1;
+      
+      await updateDoc(postRef, {
+        likes: newLikesCount
+      });
+      
+      setLikesCount(newLikesCount);
+      setIsLiked(!isLiked);
+      
+      console.log(`✅ ${isLiked ? 'Unliked' : 'Liked'} post:`, id);
+    } catch (error) {
+      console.error('❌ Error updating likes:', error);
     }
   };
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <BodyText>Loading post...</BodyText>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (!post) {
     return (
@@ -104,11 +204,30 @@ const PostDetail = () => {
                 day: 'numeric'
               })}</SmallText>
             </div>
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
               <SmallText>{post.readTime}</SmallText>
+            </div> */}
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleLike}
+                className={`px-3 py-2 transition-all duration-300 hover:scale-105 border-2 ${
+                  isLiked 
+                    ? 'text-red-500 border-red-500 hover:bg-red-50' 
+                    : 'text-muted-foreground border-border hover:text-red-500 hover:border-red-500'
+                }`}
+              >
+                <Heart 
+                  className={`w-5 h-5 mr-2 transition-all duration-300 ${
+                    isLiked ? 'fill-current' : 'fill-none'
+                  }`} 
+                />
+                <span className="font-medium">{likesCount}</span>
+              </Button>
             </div>
-            <Button 
+            {/* <Button 
               variant="ghost" 
               size="sm" 
               onClick={handleShare}
@@ -116,7 +235,7 @@ const PostDetail = () => {
             >
               <Share2 className="w-4 h-4 mr-1" />
               Share
-            </Button>
+            </Button> */}
           </div>
 
           <Separator className="mb-8" />

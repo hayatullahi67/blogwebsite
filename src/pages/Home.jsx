@@ -5,7 +5,7 @@ import { Heading1, Heading2, BodyText } from '../components/atoms/Typography';
 import { Badge } from '../components/ui/badge';
 import { Search } from 'lucide-react';
 import { Input } from '../components/ui/input';
-import postsData from '../data/posts.json';
+import { fetchPosts } from '../services/postsService';
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -13,7 +13,12 @@ const Home = () => {
   const [selectedTag, setSelectedTag] = useState('');
 
   useEffect(() => {
-    setPosts(postsData);
+    // Fetch posts from Firebase instead of hardcoded JSON
+    fetchPosts()
+      .then(setPosts)
+      .catch(error => {
+        console.error('Error fetching posts:', error);
+      });
   }, []);
 
   // Get all unique tags

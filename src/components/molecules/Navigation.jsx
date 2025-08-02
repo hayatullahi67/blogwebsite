@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, BookOpen } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import Button from '../atoms/Button';
+import logo from '../../images/MindofAmin.jpg';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,10 +21,14 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-              <BookOpen className="h-8 w-8 text-primary" />
-              <span className="font-bold text-xl text-foreground">Mind of Amin</span>
-            </Link>
+                    <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+          <img 
+            src={logo} 
+            alt="Mind of Amin Logo" 
+            className="h-[80px] w=[200px] object-cover rounded"
+          />
+          {/* <span className="font-bold text-xl text-foreground">Mind of Amin</span> */}
+        </Link>
           </div>
 
           {/* Desktop Navigation */}

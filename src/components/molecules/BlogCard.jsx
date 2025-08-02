@@ -5,11 +5,25 @@ import Button from '../atoms/Button';
 import { Heading4, BodyText, SmallText } from '../atoms/Typography';
 import { Clock, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { doc, updateDoc, increment } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 
 const BlogCard = ({ post }) => {
   const navigate = useNavigate();
 
-  const handleReadMore = () => {
+  const handleReadMore = async () => {
+    try {
+      // Increment views count in Firebase
+      const postRef = doc(db, 'posts', post.id);
+      await updateDoc(postRef, {
+        views: increment(1)
+      });
+      console.log('✅ Views incremented for post:', post.id);
+    } catch (error) {
+      console.error('❌ Error incrementing views:', error);
+    }
+    
+    // Navigate to post detail page
     navigate(`/post/${post.id}`);
   };
 
@@ -45,10 +59,10 @@ const BlogCard = ({ post }) => {
             <Calendar className="w-4 h-4" />
             <span>{new Date(post.date).toLocaleDateString()}</span>
           </div>
-          <div className="flex items-center gap-1">
+          {/* <div className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
             <span>{post.readTime}</span>
-          </div>
+          </div> */}
         </div>
         <Button 
           onClick={handleReadMore}
