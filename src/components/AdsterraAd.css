@@ -1,0 +1,92 @@
+/* Adsterra Ad Styles */
+.adsterra-ad {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar ad styles */
+.sidebar-ad {
+  position: sticky;
+  top: 20px;
+  margin-bottom: 20px;
+}
+
+.sidebar-adsterra {
+  background: #ffffff;
+}
+
+/* Horizontal banner ad styles */
+.horizontal-banner-ad {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.horizontal-adsterra {
+  background: #ffffff;
+}
+
+/* In-content ad styles */
+.in-content-ad {
+  margin: 30px 0;
+  text-align: center;
+  padding: 15px 0;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.in-content-adsterra {
+  background: #ffffff;
+}
+
+/* Footer ad styles */
+.footer-ad {
+  margin-top: 40px;
+  text-align: center;
+  padding: 20px 0;
+  background: #f8f9fa;
+}
+
+.footer-adsterra {
+  background: #ffffff;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .sidebar-ad {
+    position: static;
+    margin: 20px 0;
+  }
+  
+  .adsterra-ad {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Loading state */
+.adsterra-ad:empty::before {
+  content: "Loading ad...";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Ad label (optional - for transparency) */
+.adsterra-ad::after {
+  content: "Advertisement";
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  pointer-events: none;
+} 
