@@ -8,6 +8,7 @@ import { Calendar, Clock, ArrowLeft, Share2, Heart } from 'lucide-react';
 import { Separator } from '../components/ui/separator';
 import { doc, getDoc, collection, getDocs, query, where, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import AdsenseAd from '../components/AdsenseAd';
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -281,6 +282,7 @@ const PostDetail = () => {
             </div>
           </section>
         )}
+        <AdsenseAd />
       </article>
     </MainLayout>
   );

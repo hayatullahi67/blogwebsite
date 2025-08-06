@@ -4,6 +4,7 @@ import { Heading1, Heading3, BodyText } from '../components/atoms/Typography';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { BookOpen, Coffee, Lightbulb, Target } from 'lucide-react';
+import AdsenseAd from '../components/AdsenseAd';
 
 const About = () => {
   const interests = [
@@ -144,6 +145,7 @@ const About = () => {
           </section>
         </div>
       </div>
+      <AdsenseAd />
     </MainLayout>
   );
 };

@@ -3,6 +3,7 @@ import MainLayout from '../templates/MainLayout';
 import { Heading1, Heading3, BodyText } from '../components/atoms/Typography';
 import { Card, CardContent } from '../components/ui/card';
 import { Mail, Twitter, Github, Linkedin, MessageCircle, Send } from 'lucide-react';
+import AdsenseAd from '../components/AdsenseAd';
 
 const Contact = () => {
   const contactMethods = [
@@ -147,6 +148,7 @@ const Contact = () => {
           </Card>
         </section>
       </div>
+      <AdsenseAd />
     </MainLayout>
   );
 };

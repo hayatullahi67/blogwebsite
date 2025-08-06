@@ -6,6 +6,7 @@ import { Badge } from '../components/ui/badge';
 import { Search } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { fetchPosts } from '../services/postsService';
+import AdsenseAd from '../components/AdsenseAd';
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -94,12 +95,15 @@ const Home = () => {
           </div>
 
           {filteredPosts.length > 0 ? (
+            <div className='mb-5'>
             <BlogGrid posts={filteredPosts} />
+            </div>
           ) : (
             <div className="text-center py-12">
               <BodyText>No articles found matching your criteria.</BodyText>
             </div>
           )}
+          <AdsenseAd />
         </div>
       </section>
     </MainLayout>
